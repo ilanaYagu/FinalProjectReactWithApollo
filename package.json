@@ -1,0 +1,72 @@
+{
+  "name": "graphql-typescript-react",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@apollo/client": "^3.6.8",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.8.1",
+    "@graphql-codegen/cli": "^2.6.2",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/styles": "^4.11.5",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.8.4",
+    "@mui/styles": "^5.8.4",
+    "@reduxjs/toolkit": "^1.8.2",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.41",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "graphql": "^16.5.0",
+    "graphql-ws": "^5.9.0",
+    "material-ui-color": "^1.2.0",
+    "material-ui-color-picker": "^3.5.1",
+    "mui-color": "^2.0.0-beta.2",
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-dom": "^18.2.0",
+    "react-push-notification": "^1.3.0",
+    "react-redux": "^8.0.2",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.7.4",
+    "validator": "^13.7.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "codgen": "graphql-codegen --config codegen.yml"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/typescript": "2.5.1",
+    "@graphql-codegen/typescript-operations": "2.4.2",
+    "@graphql-codegen/typescript-react-apollo": "3.2.16",
+    "@types/react-beautiful-dnd": "^13.1.2",
+    "@types/validator": "^13.7.3"
+  }
+}
