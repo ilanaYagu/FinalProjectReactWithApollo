@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem, Select, SelectChangeEvent, TextareaAutosize } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { BasicItem } from '../../classes/BasicItem';
-import { Task } from '../../classes/Task';
-import { Event } from '../../classes/Event';
 import TaskForm from './TaskForm';
 import EventForm from './EventForm';
 import validator from 'validator';
 import { ItemType } from '../../types/managementTableTypes';
 import { pink } from '@mui/material/colors';
 import { validateEventInputs, validateTaskInputs } from './item-form-utils';
-import { PriorityType, StatusType, useCreateEventMutation, useCreateTaskMutation, useUpdateEventMutation, useUpdateTaskMutation } from '../../generated/graphql';
-import { GET_ALL_EVENTS, GET_ALL_TASKS } from '../../graphql/Queries';
+import { Event, PriorityType, StatusType, Task, useCreateEventMutation, useCreateTaskMutation, useUpdateEventMutation, useUpdateTaskMutation } from '../../generated/graphql';
+import { GET_ALL_EVENTS, GET_ALL_TASKS, GET_TODAY_TASKS_AND_EVENTS } from '../../graphql/Queries';
+import { filterTodayItems } from '../../date-utils';
+import { useEnterEscButtonsHook } from '../../custom-hooks/useEnterEscButtonsHook';
 
 export type TaskInputs = Omit<Task, "_id" | "title" | "description">;
 export type EventInputs = Omit<Event, "_id" | "title" | "description">;
@@ -21,7 +20,7 @@ interface ItemFormProps {
     enableSwitchType?: boolean;
     open: boolean;
     handleClose: () => void;
-    itemToUpdate?: BasicItem;
+    itemToUpdate?: Event | Task;
 }
 
 const useStyles = makeStyles({
@@ -41,20 +40,53 @@ const useStyles = makeStyles({
 
 const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: ItemFormProps) => {
     const classes = useStyles();
-    const [createEvent] = useCreateEventMutation({
-        refetchQueries: [
-            { query: GET_ALL_EVENTS },
-        ],
-    });
-    const [createTask] = useCreateTaskMutation({
-        refetchQueries: [
-            { query: GET_ALL_TASKS },
-        ],
-    });
-    const [updateEvent] = useUpdateEventMutation();
-    const [updateTask] = useUpdateTaskMutation();
 
-    let [baseInputs, setBaseInputs] = useState<BasicItem>({ title: "", _id: "", description: "" })
+    const [createEvent] = useCreateEventMutation({
+        update: (cache, { data }) => {
+            const cacheDataAllEvents = cache.readQuery({ query: GET_ALL_EVENTS }) as { events: Event[]; };
+            const cacheDataTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
+            if (data?.createEvent) {
+                cacheDataAllEvents && cache.writeQuery({ query: GET_ALL_EVENTS, data: { events: [...cacheDataAllEvents.events, data.createEvent] } });
+                if (cacheDataTodayData && filterTodayItems([data.createEvent]).length) {
+                    cache.writeQuery({
+                        query: GET_TODAY_TASKS_AND_EVENTS,
+                        data: {
+                            ...data,
+                            todayEvents: [...cacheDataTodayData.todayEvents, data.createEvent],
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+    const [createTask] = useCreateTaskMutation({
+        update: (cache, { data }) => {
+            const cacheDataAllTasks = cache.readQuery({ query: GET_ALL_TASKS }) as { tasks: Task[]; };
+            const cacheDataTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
+            if (data?.createTask) {
+                cacheDataAllTasks && cache.writeQuery({ query: GET_ALL_TASKS, data: { tasks: [...cacheDataAllTasks.tasks, data.createTask] } });
+                if (cacheDataTodayData && filterTodayItems([data.createTask]).length) {
+                    cache.writeQuery({
+                        query: GET_TODAY_TASKS_AND_EVENTS,
+                        data: {
+                            ...data,
+                            todayTasks: [...cacheDataTodayData.todayTasks, data.createTask],
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+    const [updateEvent] = useUpdateEventMutation({
+        refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }]
+    });
+    const [updateTask] = useUpdateTaskMutation({
+        refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }]
+    });
+
+    let [baseInputs, setBaseInputs] = useState<{ _id: string, title: string, description: string }>({ title: "", _id: "", description: "" })
     let [taskInputs, setTaskInputs] = useState<TaskInputs>({
         status: StatusType.Open, estimatedTime: "", priority: PriorityType.Low,
         review: " ", timeSpent: "", untilDate: "",
@@ -70,9 +102,9 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
         if (itemToUpdate) {
             setButtonText("Update");
             setBaseInputs({ ...baseInputs, _id: itemToUpdate._id, title: itemToUpdate.title, description: itemToUpdate.description });
-            if (itemToUpdate instanceof Task)
+            if (itemToUpdate.__typename === ItemType.Task)
                 setTaskInputs({ ...taskInputs, status: itemToUpdate.status, estimatedTime: itemToUpdate.estimatedTime, priority: itemToUpdate.priority, timeSpent: itemToUpdate.timeSpent, untilDate: itemToUpdate.untilDate, review: itemToUpdate.review })
-            else if (itemToUpdate instanceof Event) {
+            else if (itemToUpdate.__typename === ItemType.Event) {
                 setEventInputs({ ...eventInputs, color: itemToUpdate.color, beginningTime: itemToUpdate.beginningTime, endingTime: itemToUpdate.endingTime, location: itemToUpdate.location, notificationTime: itemToUpdate.notificationTime, invitedGuests: itemToUpdate.invitedGuests })
             }
         } else {
@@ -80,8 +112,8 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
         }
     }, []);
 
-    const formSubmit = (event: React.SyntheticEvent): void => {
-        event.preventDefault();
+    const formSubmit = (event?: React.SyntheticEvent): void => {
+        event?.preventDefault();
         if (isValidFields()) {
             if (!itemToUpdate) {
                 formType as string === ItemType.Task ?
@@ -97,6 +129,8 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
             handleClose();
         }
     }
+
+    useEnterEscButtonsHook({ handleCancel: handleClose, handleConfirm: formSubmit })
 
     const isValidFields = (): boolean => {
         let isValid: boolean = true;

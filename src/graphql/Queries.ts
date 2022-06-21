@@ -32,9 +32,9 @@ export const GET_ALL_TASKS = gql`
   }
 `;
 
-export const GET_ALL_TASKS_AND_EVENTS = gql`
- query getTasksAndEvents {
-    tasks {
+export const GET_TODAY_TASKS_AND_EVENTS = gql`
+   query getTodayTasksAndEvent{
+    todayTasks {
       _id
       title
       description
@@ -45,7 +45,7 @@ export const GET_ALL_TASKS_AND_EVENTS = gql`
       review
       timeSpent
     }
-    events {
+    todayEvents {
       _id
       title
       description

@@ -8,7 +8,7 @@ export const validateTaskInputs = (taskInputs: TaskInputs): boolean => {
     if (taskInputs.priority === PriorityType.Top && validator.trim(taskInputs.untilDate) === "") {
         alert("Please check your until date, it is an top task!");
         isValid = false;
-    } else if (!statusesOptions.includes(taskInputs.status.replace("_", " ")) || !priorityOptions.includes(taskInputs.priority)) {
+    } else if (!statusesOptions.includes(taskInputs.status) || !priorityOptions.includes(taskInputs.priority)) {
         alert("Please check your inserted priority/status details!");
         isValid = false;
     }

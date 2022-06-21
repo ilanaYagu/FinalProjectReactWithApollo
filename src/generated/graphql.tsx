@@ -92,6 +92,8 @@ export type Query = {
   _empty?: Maybe<Scalars['String']>;
   events: Array<Event>;
   tasks: Array<Task>;
+  todayEvents: Array<Maybe<Event>>;
+  todayTasks: Array<Maybe<Task>>;
 };
 
 export enum StatusType {
@@ -103,7 +105,7 @@ export enum StatusType {
 export type Subscription = {
   __typename?: 'Subscription';
   _empty?: Maybe<Scalars['String']>;
-  notificationOnIncomingEvent?: Maybe<Array<SubData>>;
+  notificationOnIncomingEvent?: Maybe<Array<NotificationOnIncomingEventData>>;
 };
 
 export type Task = {
@@ -131,8 +133,8 @@ export type TaskInput = {
   untilDate: Scalars['String'];
 };
 
-export type SubData = {
-  __typename?: 'subData';
+export type NotificationOnIncomingEventData = {
+  __typename?: 'notificationOnIncomingEventData';
   _id: Scalars['ID'];
   title: Scalars['String'];
 };
@@ -189,15 +191,15 @@ export type GetTasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetTasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', _id: string, title: string, description: string, untilDate: string, priority: PriorityType, status: StatusType, estimatedTime: string, review: string, timeSpent: string }> };
 
-export type GetTasksAndEventsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetTasksAndEventQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTasksAndEventsQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', _id: string, title: string, description: string, untilDate: string, priority: PriorityType, status: StatusType, estimatedTime: string, review: string, timeSpent: string }>, events: Array<{ __typename?: 'Event', _id: string, title: string, description: string, endingTime: string, beginningTime: string, invitedGuests: Array<string>, color: string, location: string, notificationTime: string }> };
+export type GetTasksAndEventQuery = { __typename?: 'Query', todayTasks: Array<{ __typename?: 'Task', _id: string, title: string, description: string, untilDate: string, priority: PriorityType, status: StatusType, estimatedTime: string, review: string, timeSpent: string } | null>, todayEvents: Array<{ __typename?: 'Event', _id: string, title: string, description: string, endingTime: string, beginningTime: string, invitedGuests: Array<string>, color: string, location: string, notificationTime: string } | null> };
 
 export type OnIncomingEventSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type OnIncomingEventSubscription = { __typename?: 'Subscription', notificationOnIncomingEvent?: Array<{ __typename?: 'subData', _id: string, title: string }> | null };
+export type OnIncomingEventSubscription = { __typename?: 'Subscription', notificationOnIncomingEvent?: Array<{ __typename?: 'notificationOnIncomingEventData', _id: string, title: string }> | null };
 
 
 export const DeleteEventDocument = gql`
@@ -514,9 +516,9 @@ export function useGetTasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetTasksQueryHookResult = ReturnType<typeof useGetTasksQuery>;
 export type GetTasksLazyQueryHookResult = ReturnType<typeof useGetTasksLazyQuery>;
 export type GetTasksQueryResult = Apollo.QueryResult<GetTasksQuery, GetTasksQueryVariables>;
-export const GetTasksAndEventsDocument = gql`
-    query getTasksAndEvents {
-  tasks {
+export const GetTasksAndEventDocument = gql`
+    query getTasksAndEvent {
+  todayTasks {
     _id
     title
     description
@@ -527,7 +529,7 @@ export const GetTasksAndEventsDocument = gql`
     review
     timeSpent
   }
-  events {
+  todayEvents {
     _id
     title
     description
@@ -542,31 +544,31 @@ export const GetTasksAndEventsDocument = gql`
     `;
 
 /**
- * __useGetTasksAndEventsQuery__
+ * __useGetTasksAndEventQuery__
  *
- * To run a query within a React component, call `useGetTasksAndEventsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTasksAndEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTasksAndEventQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTasksAndEventQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetTasksAndEventsQuery({
+ * const { data, loading, error } = useGetTasksAndEventQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGetTasksAndEventsQuery(baseOptions?: Apollo.QueryHookOptions<GetTasksAndEventsQuery, GetTasksAndEventsQueryVariables>) {
+export function useGetTasksAndEventQuery(baseOptions?: Apollo.QueryHookOptions<GetTasksAndEventQuery, GetTasksAndEventQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetTasksAndEventsQuery, GetTasksAndEventsQueryVariables>(GetTasksAndEventsDocument, options);
+        return Apollo.useQuery<GetTasksAndEventQuery, GetTasksAndEventQueryVariables>(GetTasksAndEventDocument, options);
       }
-export function useGetTasksAndEventsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTasksAndEventsQuery, GetTasksAndEventsQueryVariables>) {
+export function useGetTasksAndEventLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTasksAndEventQuery, GetTasksAndEventQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetTasksAndEventsQuery, GetTasksAndEventsQueryVariables>(GetTasksAndEventsDocument, options);
+          return Apollo.useLazyQuery<GetTasksAndEventQuery, GetTasksAndEventQueryVariables>(GetTasksAndEventDocument, options);
         }
-export type GetTasksAndEventsQueryHookResult = ReturnType<typeof useGetTasksAndEventsQuery>;
-export type GetTasksAndEventsLazyQueryHookResult = ReturnType<typeof useGetTasksAndEventsLazyQuery>;
-export type GetTasksAndEventsQueryResult = Apollo.QueryResult<GetTasksAndEventsQuery, GetTasksAndEventsQueryVariables>;
+export type GetTasksAndEventQueryHookResult = ReturnType<typeof useGetTasksAndEventQuery>;
+export type GetTasksAndEventLazyQueryHookResult = ReturnType<typeof useGetTasksAndEventLazyQuery>;
+export type GetTasksAndEventQueryResult = Apollo.QueryResult<GetTasksAndEventQuery, GetTasksAndEventQueryVariables>;
 export const OnIncomingEventDocument = gql`
     subscription OnIncomingEvent {
   notificationOnIncomingEvent {

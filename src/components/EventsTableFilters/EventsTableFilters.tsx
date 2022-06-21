@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { Event } from '../../classes/Event';
 import { isFutureDate, isToday } from '../../date-utils';
+import { Event } from '../../generated/graphql';
 
 enum BeginningTimeEventFilterType {
     TodayEvents = "Today Events",

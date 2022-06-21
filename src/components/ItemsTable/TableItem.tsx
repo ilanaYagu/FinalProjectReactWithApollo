@@ -1,16 +1,14 @@
 import { Box, IconButton, TableCell, TableRow } from '@mui/material';
 import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
-import { BasicItem } from '../../classes/BasicItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { OtherColumnProperties, TableHeaders } from '../../types/managementTableTypes';
 import { makeStyles } from "@material-ui/styles";
-import { Task } from '../../classes/Task';
-import { Event } from '../../classes/Event';
 import { ReactNode } from 'react';
 import { getColorIcon, getPriorityIcon, getTypeIcon } from './items-table-utils';
+import { Event, Task } from '../../generated/graphql';
 
-const customRendersHeaders = new Map<string, (item: BasicItem) => JSX.Element | "">([
+const customRendersHeaders = new Map<string, (item: Event | Task) => JSX.Element | "">([
     ["type", getTypeIcon],
     ["color", getColorIcon],
     ["priority", getPriorityIcon]
@@ -26,11 +24,11 @@ const otherColumnProperties: OtherColumnProperties<Task> | OtherColumnProperties
 };
 
 interface TableItemProps {
-    item: BasicItem;
+    item: Event | Task;
     index: number;
-    headers: TableHeaders<BasicItem>;
-    handleEditItem: (itemToUpdate: BasicItem) => void;
-    handleDeleteItem: (itemToUpdate: BasicItem) => void;
+    headers: TableHeaders<Event | Task>;
+    handleEditItem: (itemToUpdate: Event | Task) => void;
+    handleDeleteItem: (itemToUpdate: Event | Task) => void;
 }
 
 const useStyles = makeStyles({
@@ -57,7 +55,7 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
             return customRender ?
                 customRender(item) :
                 headerKey in item ?
-                    item[headerKey as keyof BasicItem]
+                    item[headerKey as keyof (Event | Task)]
                     : ""
         } else {
             return headerKey === "other" ? getOtherCell() : getActionsCell();
@@ -68,9 +66,9 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
         <Box display="flex">
             {
                 Object.entries(otherColumnProperties).map(([key, value]) => (
-                    item[key as keyof BasicItem] && !Object.keys(headers).includes(key) ?
+                    item[key as keyof (Event | Task)] && !Object.keys(headers).includes(key) ?
                         <div className={classes.otherInfo}>
-                            <div><em className={classes.otherInfoText}>{value}</em></div> {item[key as keyof BasicItem]}
+                            <div><em className={classes.otherInfoText}>{value}</em></div> {item[key as keyof (Event | Task)]}
                         </div>
                         :
                         " "

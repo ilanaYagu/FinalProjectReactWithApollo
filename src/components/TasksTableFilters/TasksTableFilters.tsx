@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { Task } from '../../classes/Task';
+import { Task } from '../../generated/graphql';
 
 interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
@@ -9,7 +9,7 @@ interface TasksTableFiltersProps {
 
 enum StatusFilterType {
     Open = "Open",
-    InProgress = "In Progress",
+    Proceeding = "Proceeding",
     Done = "Done",
     All = "All Statuses"
 }

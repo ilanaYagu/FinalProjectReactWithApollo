@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -20,11 +19,6 @@ const wsLink = new GraphQLWsLink(createClient({
   url: 'ws://localhost:5006/graphql',
 }));
 
-// The split function takes three parameters:
-//
-// * A function that's called for each operation to execute
-// * The Link to use for an operation if the function returns a "truthy" value
-// * The Link to use for an operation if the function returns a "falsy" value
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -36,6 +30,7 @@ const splitLink = split(
   wsLink,
   httpLink,
 );
+
 const client = new ApolloClient({
   link: splitLink,
   cache: new InMemoryCache(),

@@ -1,6 +1,5 @@
+import { Event, Task } from "./generated/graphql";
 import { TableHeaders } from "./types/managementTableTypes";
-import { Task } from "./classes/Task";
-import { Event } from "./classes/Event";
 
 export const columnsForTasksTable: TableHeaders<Task> = {
     type: "Type",

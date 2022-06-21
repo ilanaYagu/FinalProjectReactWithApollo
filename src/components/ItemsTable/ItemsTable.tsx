@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Box, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import { ExternalHeaders, TableHeaders } from "../../types/managementTableTypes";
-import { BasicItem } from "../../classes/BasicItem";
 import TableItem from "./TableItem";
 import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
+import { Event, Task } from "../../generated/graphql";
 
 const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
 export const customSortProperties: CustomSortProperties[] = [{ sortField: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
@@ -13,16 +13,16 @@ export enum SortOrderType {
     Desc = "desc",
     Nothing = ""
 }
-export type SortField = keyof TableHeaders<BasicItem> | "";
+export type SortField = keyof TableHeaders<Event | Task> | "";
 
 interface ItemsTableProps {
-    items: BasicItem[];
-    setItems(newItems: BasicItem[]): void;
-    headers: TableHeaders<BasicItem>;
+    items: (Event | Task)[];
+    setItems(newItems: (Event | Task)[]): void;
+    headers: TableHeaders<Event | Task>;
     search: string;
-    searchableProperties: (keyof BasicItem)[];
-    handleEditItem: (itemToUpdate: BasicItem) => void;
-    handleDeleteItem: (itemToDelete: BasicItem) => void;
+    searchableProperties: (keyof (Event | Task))[];
+    handleEditItem: (itemToUpdate: Event | Task) => void;
+    handleDeleteItem: (itemToDelete: Event | Task) => void;
 }
 
 const ItemsTable = ({ items, setItems, headers, search, searchableProperties, handleEditItem, handleDeleteItem }: ItemsTableProps) => {
@@ -74,7 +74,7 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
             </Droppable>
         </DragDropContext>
 
-    const getRow = (item: BasicItem, index: number) =>
+    const getRow = (item: Event | Task, index: number) =>
         <TableItem item={item} index={index} headers={headers} handleEditItem={handleEditItem} handleDeleteItem={handleDeleteItem} />
 
     const handleDragEnd = (result: DropResult) => {
@@ -88,9 +88,9 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
         setItems(temp);
     };
 
-    const isMatchedWithSearchFilter = (item: BasicItem) => {
+    const isMatchedWithSearchFilter = (item: Event | Task) => {
         let isMatched = false;
-        searchableProperties.forEach((property: keyof BasicItem) => {
+        searchableProperties.forEach((property) => {
             const valueToCheck: string = item[property] as string;
             isMatched = isMatched || valueToCheck?.toLowerCase().includes(search.toLowerCase());
         });
