@@ -2,32 +2,31 @@ import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { isFutureDate, isToday } from '../../date-utils';
 import { Event } from '../../generated/graphql';
-
-enum BeginningTimeEventFilterType {
-    TodayEvents = "Today Events",
-    FutureEvents = "Future Events",
-    AllEvents = "All Events"
-}
+import { AppDispatch, RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
+import { BeginningTimeEventFilterType, chooseBeginningTimeEventsFilter } from '../../feature/activeFiltersSlice';
+import { useDispatch } from 'react-redux';
 
 interface EventsTableFiltersProps {
     setEvents(events: Event[]): void;
-    data: Event[];
+    data?: Event[];
 }
 
 const EventsTableFilters = ({ setEvents, data }: EventsTableFiltersProps) => {
-    const [filter, setFilter] = useState<BeginningTimeEventFilterType>(BeginningTimeEventFilterType.AllEvents);
+    const beginningTimeFilter = useSelector((state: RootState) => state.activeFilters.beginningTimeEventsFilter);
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        setEvents(filteredEvents());
-    }, [filter, data])
+        setEvents(filteredEvents() || []);
+    }, [beginningTimeFilter, data])
 
-    const filteredEvents = (): Event[] =>
-        data.filter((event: Event) => {
+    const filteredEvents = (): Event[] | undefined =>
+        data?.filter((event: Event) => {
             const eventDate = new Date(event.beginningTime);
-            if (filter === BeginningTimeEventFilterType.AllEvents) {
+            if (beginningTimeFilter === BeginningTimeEventFilterType.All) {
                 return true;
             }
-            else if (filter === BeginningTimeEventFilterType.TodayEvents) {
+            else if (beginningTimeFilter === BeginningTimeEventFilterType.TodayEvents) {
                 return isToday(eventDate);
             }
             else {
@@ -36,10 +35,10 @@ const EventsTableFilters = ({ setEvents, data }: EventsTableFiltersProps) => {
         })
 
     return (
-        <Select sx={{ m: "0.2%" }} size="small" value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilterType)}>
+        <Select sx={{ mt: "1.5%" }} size="small" value={beginningTimeFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseBeginningTimeEventsFilter(event.target.value as BeginningTimeEventFilterType))}>
             {
                 Object.values(BeginningTimeEventFilterType).map((value) => {
-                    return <MenuItem value={value}>{value}</MenuItem>
+                    return <MenuItem key={value} value={value}>{value}</MenuItem>
                 })
             }
         </Select>

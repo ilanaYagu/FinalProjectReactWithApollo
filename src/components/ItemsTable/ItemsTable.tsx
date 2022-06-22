@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Box, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
-import { ExternalHeaders, TableHeaders } from "../../types/managementTableTypes";
+import { ExternalHeaders, ItemType, TableHeaders } from "../../types/managementTableTypes";
 import TableItem from "./TableItem";
 import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
 import { Event, Task } from "../../generated/graphql";
+import ItemForm from "../ItemForm/ItemForm";
+import DeleteItemForm from "../DeleteForm/DeleteForm";
+import { AppDispatch, RootState } from "../../app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { closeItemForm, openDeleteItemForm, openItemForm } from "../../feature/modalsSlice";
 
 const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
 export const customSortProperties: CustomSortProperties[] = [{ sortField: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
@@ -16,20 +21,20 @@ export enum SortOrderType {
 export type SortField = keyof TableHeaders<Event | Task> | "";
 
 interface ItemsTableProps {
+    type?: ItemType;
     items: (Event | Task)[];
     setItems(newItems: (Event | Task)[]): void;
     headers: TableHeaders<Event | Task>;
     search: string;
     searchableProperties: (keyof (Event | Task))[];
-    handleEditItem: (itemToUpdate: Event | Task) => void;
-    handleDeleteItem: (itemToDelete: Event | Task) => void;
 }
 
-const ItemsTable = ({ items, setItems, headers, search, searchableProperties, handleEditItem, handleDeleteItem }: ItemsTableProps) => {
+const ItemsTable = ({ type, items, setItems, headers, search, searchableProperties }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortField>("");
     const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Nothing);
+    const showDeleteItemForm = useSelector((state: RootState) => state.modals.deleteItemForm);
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value));
@@ -45,8 +50,8 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
     const getHeader = () =>
         <TableHead>
             <TableRow>
-                {Object.entries(headers).map(([key, header]) => {
-                    return <TableCell sx={{ fontWeight: "bold", fontSize: "18px", whiteSpace: "nowrap" }} align="center">
+                {Object.entries(headers).map(([key, header]) =>
+                    <TableCell key={key} sx={{ fontWeight: "bold", fontSize: "18px", whiteSpace: "nowrap" }} align="center">
                         {
                             unsortableHeaders.includes(key as ExternalHeaders) ?
                                 header
@@ -56,7 +61,7 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
                                 </TableSortLabel>
                         }
                     </TableCell>
-                })}
+                )}
             </TableRow>
         </TableHead>
 
@@ -75,7 +80,7 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
         </DragDropContext>
 
     const getRow = (item: Event | Task, index: number) =>
-        <TableItem item={item} index={index} headers={headers} handleEditItem={handleEditItem} handleDeleteItem={handleDeleteItem} />
+        <TableItem key={index} item={item} index={index} headers={headers} />
 
     const handleDragEnd = (result: DropResult) => {
         if (!result.destination || result.destination.index === result.source.index) {
@@ -98,12 +103,15 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
     }
 
     const getTable = () =>
-        <Table>
-            {getHeader()}
-            {getBody()}
-            <TablePagination sx={{ overflow: "inherit", marginTop: "30%" }} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
+        <>
+            <Table>
+                {getHeader()}
+                {getBody()}
+            </Table>
+            <TablePagination sx={{ marginTop: "5%", display: "inline-flex" }} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
                 rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage: number) => setPage(newPage)} onRowsPerPageChange={handleChangeRowsPerPage} />
-        </Table>
+        </>
+
 
     return (
         <>
@@ -115,9 +123,9 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
                         <h1>NO ITEMS</h1>
                     </Box>
             }
+            {showDeleteItemForm.open && showDeleteItemForm.item &&
+                <DeleteItemForm item={showDeleteItemForm.item} open={showDeleteItemForm.open} />}
         </>
-
-
     );
 }
 

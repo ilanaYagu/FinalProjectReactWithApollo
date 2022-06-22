@@ -55,9 +55,9 @@ const App = () => {
       <Router>
         <Notifications />
         <Routes>
-          <Route path="/tasks" element={<ManagementPage type={ItemType.Task} headers={columnsForTasksTable} />} />
-          <Route path="/events" element={<ManagementPage type={ItemType.Event} headers={columnsForEventsTable} />} />
-          <Route path="/dashboard" element={<ManagementPage headers={columnsForTodayTasksAndEventsTable} />} />
+          <Route path="/tasks" element={<ManagementPage type={ItemType.Task} />} />
+          <Route path="/events" element={<ManagementPage type={ItemType.Event} />} />
+          <Route path="/dashboard" element={<ManagementPage />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
         <NavSidebar />

@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import settingsReducer from "../feature/settingsSlice";
-import dashboardFiltersReducer from "../feature/dashboardFiltersSlice";
+import activeFiltersReducer from "../feature/activeFiltersSlice";
+import ModalsReducer from "../feature/modalsSlice";
 
 export const API_URL = "http://localhost:1025/";
 
 export const store = configureStore({
     reducer: {
-        settings: settingsReducer,
-        dashboardFilters: dashboardFiltersReducer
+        activeFilters: activeFiltersReducer,
+        modals: ModalsReducer
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         serializableCheck: false

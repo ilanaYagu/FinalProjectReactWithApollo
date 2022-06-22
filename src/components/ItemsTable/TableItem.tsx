@@ -7,6 +7,9 @@ import { makeStyles } from "@material-ui/styles";
 import { ReactNode } from 'react';
 import { getColorIcon, getPriorityIcon, getTypeIcon } from './items-table-utils';
 import { Event, Task } from '../../generated/graphql';
+import { openDeleteItemForm, openItemForm } from '../../feature/modalsSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
 
 const customRendersHeaders = new Map<string, (item: Event | Task) => JSX.Element | "">([
     ["type", getTypeIcon],
@@ -27,8 +30,6 @@ interface TableItemProps {
     item: Event | Task;
     index: number;
     headers: TableHeaders<Event | Task>;
-    handleEditItem: (itemToUpdate: Event | Task) => void;
-    handleDeleteItem: (itemToUpdate: Event | Task) => void;
 }
 
 const useStyles = makeStyles({
@@ -41,11 +42,12 @@ const useStyles = makeStyles({
     }
 });
 
-const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: TableItemProps) => {
+const TableItem = ({ item, index, headers }: TableItemProps) => {
     const classes = useStyles();
+    const dispatch = useDispatch<AppDispatch>();
 
     const getTableCell = (headerKey: string) =>
-        <TableCell sx={{ whiteSpace: "nowrap", width: "10%" }} align="center">
+        <TableCell key={headerKey} sx={{ whiteSpace: "nowrap", width: "10%" }} align="center">
             {getTableCellContent(headerKey)}
         </TableCell>
 
@@ -67,7 +69,7 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
             {
                 Object.entries(otherColumnProperties).map(([key, value]) => (
                     item[key as keyof (Event | Task)] && !Object.keys(headers).includes(key) ?
-                        <div className={classes.otherInfo}>
+                        <div key={key} className={classes.otherInfo}>
                             <div><em className={classes.otherInfoText}>{value}</em></div> {item[key as keyof (Event | Task)]}
                         </div>
                         :
@@ -78,10 +80,10 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
 
     const getActionsCell = () =>
         <>
-            <IconButton color="primary" onClick={() => handleEditItem(item)}>
+            <IconButton color="primary" onClick={() => dispatch(openItemForm({ item }))}>
                 <EditIcon />
             </IconButton>
-            <IconButton onClick={() => handleDeleteItem(item)}>
+            <IconButton onClick={() => dispatch(openDeleteItemForm({ item }))}>
                 <DeleteIcon />
             </IconButton>
         </>

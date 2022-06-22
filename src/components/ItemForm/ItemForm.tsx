@@ -10,7 +10,8 @@ import { validateEventInputs, validateTaskInputs } from './item-form-utils';
 import { Event, PriorityType, StatusType, Task, useCreateEventMutation, useCreateTaskMutation, useUpdateEventMutation, useUpdateTaskMutation } from '../../generated/graphql';
 import { GET_ALL_EVENTS, GET_ALL_TASKS, GET_TODAY_TASKS_AND_EVENTS } from '../../graphql/Queries';
 import { filterTodayItems } from '../../date-utils';
-import { useEnterEscButtonsHook } from '../../custom-hooks/useEnterEscButtonsHook';
+import { useEnterButtonHook } from '../../listeners-hooks/useEnterButtonHook';
+import { useEscButtonHook } from '../../listeners-hooks/useEscButtonHook';
 
 export type TaskInputs = Omit<Task, "_id" | "title" | "description">;
 export type EventInputs = Omit<Event, "_id" | "title" | "description">;
@@ -44,16 +45,13 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
     const [createEvent] = useCreateEventMutation({
         update: (cache, { data }) => {
             const cacheDataAllEvents = cache.readQuery({ query: GET_ALL_EVENTS }) as { events: Event[]; };
-            const cacheDataTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
+            const cacheTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
             if (data?.createEvent) {
                 cacheDataAllEvents && cache.writeQuery({ query: GET_ALL_EVENTS, data: { events: [...cacheDataAllEvents.events, data.createEvent] } });
-                if (cacheDataTodayData && filterTodayItems([data.createEvent]).length) {
+                if (cacheTodayData && filterTodayItems([data.createEvent]).length) {
                     cache.writeQuery({
                         query: GET_TODAY_TASKS_AND_EVENTS,
-                        data: {
-                            ...data,
-                            todayEvents: [...cacheDataTodayData.todayEvents, data.createEvent],
-                        }
+                        data: { todayTasks: cacheTodayData.todayTasks, todayEvents: [...cacheTodayData.todayEvents, data.createEvent], }
                     });
                 }
             }
@@ -63,28 +61,21 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
     const [createTask] = useCreateTaskMutation({
         update: (cache, { data }) => {
             const cacheDataAllTasks = cache.readQuery({ query: GET_ALL_TASKS }) as { tasks: Task[]; };
-            const cacheDataTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
+            const cacheTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
             if (data?.createTask) {
                 cacheDataAllTasks && cache.writeQuery({ query: GET_ALL_TASKS, data: { tasks: [...cacheDataAllTasks.tasks, data.createTask] } });
-                if (cacheDataTodayData && filterTodayItems([data.createTask]).length) {
+                if (cacheTodayData && filterTodayItems([data.createTask]).length) {
                     cache.writeQuery({
                         query: GET_TODAY_TASKS_AND_EVENTS,
-                        data: {
-                            ...data,
-                            todayTasks: [...cacheDataTodayData.todayTasks, data.createTask],
-                        }
+                        data: { todayEvents: cacheTodayData.todayEvents, todayTasks: [...cacheTodayData.todayTasks, data.createTask], }
                     });
                 }
             }
         }
     });
 
-    const [updateEvent] = useUpdateEventMutation({
-        refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }]
-    });
-    const [updateTask] = useUpdateTaskMutation({
-        refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }]
-    });
+    const [updateEvent] = useUpdateEventMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }] });
+    const [updateTask] = useUpdateTaskMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }] });
 
     let [baseInputs, setBaseInputs] = useState<{ _id: string, title: string, description: string }>({ title: "", _id: "", description: "" })
     let [taskInputs, setTaskInputs] = useState<TaskInputs>({
@@ -130,7 +121,8 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
         }
     }
 
-    useEnterEscButtonsHook({ handleCancel: handleClose, handleConfirm: formSubmit })
+    useEnterButtonHook({ handleConfirm: formSubmit });
+    useEscButtonHook({ handleCancel: handleClose });
 
     const isValidFields = (): boolean => {
         let isValid: boolean = true;
@@ -166,7 +158,7 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
             <Select value={formType} label="Type" onChange={(event: SelectChangeEvent<string>) => setFormType(event.target.value as ItemType)}>
                 {
                     Object.values(ItemType).map((typeOption) =>
-                        <MenuItem value={typeOption}>{typeOption}</MenuItem>
+                        <MenuItem key={typeOption} value={typeOption}>{typeOption}</MenuItem>
                     )
                 }
             </Select>

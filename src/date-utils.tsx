@@ -17,7 +17,6 @@ export const filterTodayItems = (items: (Event | Task)[]): (Event | Task)[] =>
         if (item.__typename === ItemType.Event) {
             return isToday(new Date(item.beginningTime))
         } else if (item.__typename === ItemType.Task) {
-            console.log("new taskk checking")
             return isToday(new Date(item.untilDate))
         }
         return false;

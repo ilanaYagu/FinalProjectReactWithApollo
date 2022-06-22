@@ -1,20 +1,25 @@
-
 import { useEffect } from "react";
 
-export const useSearchShourtCutHook = () => {
+interface UseEnterButtonProps {
+    handleConfirm: Function;
+}
+
+export const useEnterButtonHook = ({ handleConfirm }: UseEnterButtonProps) => {
 
     useEffect(() => {
         const listener = (event: Event) => {
             if (event instanceof KeyboardEvent) {
-                if (event.ctrlKey && event.code === "KeyF") {
+                if ((event.key === "Enter" || event.key === "NumpadEnter")) {
                     event.preventDefault();
-                    (document.querySelector("#search") as HTMLElement).focus();
+                    handleConfirm();
                 }
             }
         };
+
         document.addEventListener("keydown", listener);
         return () => {
             document.removeEventListener("keydown", listener);
         };
     });
+
 };

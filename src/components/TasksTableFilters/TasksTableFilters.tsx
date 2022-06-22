@@ -1,62 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Task } from '../../generated/graphql';
+import { choosePriorityTasksFilter, chooseStatusTasksFilter, PriorityFilterType, StatusFilterType } from '../../feature/activeFiltersSlice';
+import { useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../app/store';
+import { useDispatch } from 'react-redux';
 
 interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
-    data: Task[];
-}
-
-enum StatusFilterType {
-    Open = "Open",
-    Proceeding = "Proceeding",
-    Done = "Done",
-    All = "All Statuses"
-}
-
-enum PriorityFilterType {
-    Top = "Top",
-    Regular = "Regular",
-    Low = "Low",
-    All = "All Priorities"
-}
-
-interface TasksFilters {
-    statusFilter: StatusFilterType,
-    priorityFilter: PriorityFilterType
+    data?: Task[];
 }
 
 const TasksTableFilters = ({ setTasks, data }: TasksTableFiltersProps) => {
-    const [filters, setFilters] = useState<TasksFilters>({
-        statusFilter: StatusFilterType.All,
-        priorityFilter: PriorityFilterType.All,
-    });
+
+    const statusFilter = useSelector((state: RootState) => state.activeFilters.statusTasksFilter);
+    const priorityFilter = useSelector((state: RootState) => state.activeFilters.priorityTasksFilter)
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        setTasks(filteredTasks());
-    }, [filters, data])
+        setTasks(filteredTasks() || []);
+    }, [statusFilter, priorityFilter, data])
 
-    const filteredTasks = (): Task[] => {
-        return data.filter((task: Task) => {
-            return (filters.priorityFilter === PriorityFilterType.All || task.priority as string === filters.priorityFilter)
-                && (filters.statusFilter === StatusFilterType.All || task.status as string === filters.statusFilter)
-        })
-    }
+    const filteredTasks = (): Task[] | undefined =>
+        data?.filter((task: Task) =>
+            (priorityFilter === PriorityFilterType.All || task.priority as string === priorityFilter)
+            && (statusFilter === StatusFilterType.All || task.status as string === statusFilter))
 
     return (
         <>
-            <Select sx={{ m: "0.2%" }} size="small" value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilterType })}>
+            <Select sx={{ mt: "1.5%", mr: "1%" }} size="small" value={statusFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseStatusTasksFilter(event.target.value as StatusFilterType))}>
                 {
                     Object.values(StatusFilterType).map((value) => {
-                        return <MenuItem value={value}>{value}</MenuItem>
+                        return <MenuItem key={value} value={value}>{value}</MenuItem>
                     })
                 }
             </Select>
 
-            <Select sx={{ m: "0.2%" }} size="small" value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilterType })}>
+            <Select sx={{ mt: "1.5%" }} size="small" value={priorityFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(choosePriorityTasksFilter(event.target.value as PriorityFilterType))}  >
                 {
                     Object.values(PriorityFilterType).map((value) => {
-                        return <MenuItem value={value}>{value}</MenuItem>
+                        return <MenuItem key={value} value={value}>{value}</MenuItem>
                     })
                 }
             </Select>
