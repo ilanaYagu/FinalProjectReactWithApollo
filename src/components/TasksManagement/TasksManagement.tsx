@@ -1,12 +1,10 @@
 import { Box } from "@mui/material";
 import { useState } from "react";
 import ItemsTable from "../ItemsTable/ItemsTable";
-import { Event, Task, useGetTasksQuery } from "../../generated/graphql";
+import { Task, useGetTasksQuery } from "../../generated/graphql";
 import TasksTableFilters from "../TasksTableFilters/TasksTableFilters";
 import { columnsForTasksTable } from "../../constants";
 import { ItemType } from "../../types/managementTableTypes";
-
-const searchableProperties: (keyof (Event | Task))[] = ["title"];
 
 interface TasksManagementProps {
     search: string;
@@ -27,7 +25,7 @@ const TasksManagement = ({ search }: TasksManagementProps) => {
                     <>
                         <h4>Total Tasks: {tasksFetchRes.data?.tasks.length}</h4>
                         <ItemsTable type={ItemType.Task} headers={columnsForTasksTable} items={filteredTasks} setItems={(newItems: Task[]) => setFilteredTasks(newItems)}
-                            search={search} searchableProperties={searchableProperties} />
+                            search={search} />
                     </>
             }
         </>

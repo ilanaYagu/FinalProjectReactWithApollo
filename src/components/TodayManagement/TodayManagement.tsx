@@ -1,13 +1,9 @@
 import { Box } from "@mui/material";
 import { useState } from "react";
 import ItemsTable from "../ItemsTable/ItemsTable";
-import { Event, Task, useGetEventsQuery, useGetTodayTasksAndEventQuery } from "../../generated/graphql";
-import { columnsForEventsTable, columnsForTodayTasksAndEventsTable } from "../../constants";
-import EventsTableFilters from "../EventsTableFilters/EventsTableFilters";
+import { Event, Task, useGetTodayTasksAndEventQuery } from "../../generated/graphql";
+import { columnsForTodayTasksAndEventsTable } from "../../constants";
 import DashboardTableToggleFilters from "../DashboardTableToggleFilters/DashboardTableToggleFilters";
-import { ItemType } from "../../types/managementTableTypes";
-
-const searchableProperties: (keyof (Event | Task))[] = ["title"];
 
 interface TodayManagementProps {
     search: string;
@@ -28,7 +24,7 @@ const TodayManagement = ({ search }: TodayManagementProps) => {
                     <>
                         <h4>Total Events: {todayFetchRes.data?.todayEvents?.length}, Total Tasks: {todayFetchRes.data?.todayTasks?.length}</h4>
                         <ItemsTable headers={columnsForTodayTasksAndEventsTable} items={filteredTodays || []} setItems={setFilteredTodays}
-                            search={search} searchableProperties={searchableProperties} />
+                            search={search} />
                     </>
             }
         </>

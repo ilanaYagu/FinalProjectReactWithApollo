@@ -5,11 +5,9 @@ import { ExternalHeaders, ItemType, TableHeaders } from "../../types/managementT
 import TableItem from "./TableItem";
 import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
 import { Event, Task } from "../../generated/graphql";
-import ItemForm from "../ItemForm/ItemForm";
 import DeleteItemForm from "../DeleteForm/DeleteForm";
-import { AppDispatch, RootState } from "../../app/store";
-import { useDispatch, useSelector } from "react-redux";
-import { closeItemForm, openDeleteItemForm, openItemForm } from "../../feature/modalsSlice";
+import { RootState } from "../../app/store";
+import { useSelector } from "react-redux";
 
 const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
 export const customSortProperties: CustomSortProperties[] = [{ sortField: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
@@ -26,10 +24,9 @@ interface ItemsTableProps {
     setItems(newItems: (Event | Task)[]): void;
     headers: TableHeaders<Event | Task>;
     search: string;
-    searchableProperties: (keyof (Event | Task))[];
 }
 
-const ItemsTable = ({ type, items, setItems, headers, search, searchableProperties }: ItemsTableProps) => {
+const ItemsTable = ({ items, setItems, headers, search }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortField>("");
@@ -93,14 +90,8 @@ const ItemsTable = ({ type, items, setItems, headers, search, searchableProperti
         setItems(temp);
     };
 
-    const isMatchedWithSearchFilter = (item: Event | Task) => {
-        let isMatched = false;
-        searchableProperties.forEach((property) => {
-            const valueToCheck: string = item[property] as string;
-            isMatched = isMatched || valueToCheck?.toLowerCase().includes(search.toLowerCase());
-        });
-        return isMatched;
-    }
+    const isMatchedWithSearchFilter = (item: Event | Task) =>
+        item.title.toLowerCase().includes(search.toLowerCase());
 
     const getTable = () =>
         <>

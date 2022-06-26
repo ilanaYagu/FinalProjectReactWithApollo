@@ -26,7 +26,7 @@ const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
     return (
         <div>
             {invitedGuests?.map((name: string, index: number) => (
-                <Chip label={name} variant="outlined"
+                <Chip key={index} label={name} variant="outlined"
                     onDelete={() => {
                         const newInvitedGuests = [...invitedGuests]
                         newInvitedGuests.splice(index, 1);

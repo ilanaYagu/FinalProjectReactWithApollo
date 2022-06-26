@@ -9,7 +9,7 @@ export const useEnterButtonHook = ({ handleConfirm }: UseEnterButtonProps) => {
     useEffect(() => {
         const listener = (event: Event) => {
             if (event instanceof KeyboardEvent) {
-                if ((event.key === "Enter" || event.key === "NumpadEnter")) {
+                if (((event.key === "Enter" || event.key === "NumpadEnter") && !event.shiftKey)) {
                     event.preventDefault();
                     handleConfirm();
                 }
