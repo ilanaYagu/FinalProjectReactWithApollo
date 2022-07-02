@@ -38,7 +38,7 @@ const TaskForm = ({ itemToUpdate, handleClose }: TaskFormProps) => {
     const [updateTask] = useUpdateTaskMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }] });
 
     let [taskInputs, setTaskInputs] = useState<Task>({
-        _id: itemToUpdate?._id || "", description: itemToUpdate?.description || "", title: itemToUpdate?._id || "",
+        _id: itemToUpdate?._id || "", description: itemToUpdate?.description || "", title: itemToUpdate?.title || "",
         status: itemToUpdate?.status || StatusType.Open, estimatedTime: itemToUpdate?.estimatedTime || "", priority: itemToUpdate?.priority || PriorityType.Low,
         review: itemToUpdate?.review || "", timeSpent: itemToUpdate?.timeSpent || "", untilDate: itemToUpdate?.untilDate || "",
     });
