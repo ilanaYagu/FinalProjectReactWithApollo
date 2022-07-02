@@ -34,15 +34,13 @@ const EventsTableFilters = ({ setEvents, data }: EventsTableFiltersProps) => {
             }
         })
 
-    return (
-        <Select sx={{ mt: "1.5%" }} size="small" value={beginningTimeFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseBeginningTimeEventsFilter(event.target.value as BeginningTimeEventFilterType))}>
-            {
-                Object.values(BeginningTimeEventFilterType).map((value) => {
-                    return <MenuItem key={value} value={value}>{value}</MenuItem>
-                })
-            }
-        </Select>
-    );
+    return <Select sx={{ mt: "1.5%" }} size="small" value={beginningTimeFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseBeginningTimeEventsFilter(event.target.value as BeginningTimeEventFilterType))}>
+        {
+            Object.values(BeginningTimeEventFilterType).map((value) => {
+                return <MenuItem key={value} value={value}>{value}</MenuItem>
+            })
+        }
+    </Select>
 };
 
 export default EventsTableFilters;

@@ -3,13 +3,9 @@ import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { OtherColumnProperties, TableHeaders } from '../../types/managementTableTypes';
-import { makeStyles } from "@material-ui/styles";
 import { ReactNode } from 'react';
 import { getColorIcon, getPriorityIcon, getTypeIcon } from './items-table-utils';
 import { Event, Task } from '../../generated/graphql';
-import { openDeleteItemForm, openItemForm } from '../../feature/modalsSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../app/store';
 
 const customRendersHeaders = new Map<string, (item: Event | Task) => JSX.Element | "">([
     ["type", getTypeIcon],
@@ -30,21 +26,11 @@ interface TableItemProps {
     item: Event | Task;
     index: number;
     headers: TableHeaders<Event | Task>;
+    handleEditItem(item: Task | Event): void;
+    handleDeleteItem(item: Task | Event): void;
 }
 
-const useStyles = makeStyles({
-    otherInfoText: {
-        textDecoration: "underline"
-    },
-    otherInfo: {
-        margin: "4%",
-        marginRight: "1%"
-    }
-});
-
-const TableItem = ({ item, index, headers }: TableItemProps) => {
-    const classes = useStyles();
-    const dispatch = useDispatch<AppDispatch>();
+const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: TableItemProps) => {
 
     const getTableCell = (headerKey: string) =>
         <TableCell key={headerKey} sx={{ whiteSpace: "nowrap", width: "10%" }} align="center">
@@ -67,28 +53,29 @@ const TableItem = ({ item, index, headers }: TableItemProps) => {
     const getOtherCell = () =>
         <Box display="flex">
             {
-                Object.entries(otherColumnProperties).map(([key, value]) => (
+                Object.entries(otherColumnProperties).map(([key, value]) =>
                     item[key as keyof (Event | Task)] && !Object.keys(headers).includes(key) ?
-                        <div key={key} className={classes.otherInfo}>
-                            <div><em className={classes.otherInfoText}>{value}</em></div> {item[key as keyof (Event | Task)]}
-                        </div>
+                        <Box key={key} sx={{ margin: "6%" }}>
+                            <Box sx={{ textDecoration: "underline", fontStyle: "italic" }}>{value}</Box>
+                            {item[key as keyof (Event | Task)]}
+                        </Box>
                         :
                         " "
-                ))
+                )
             }
         </Box >
 
     const getActionsCell = () =>
         <>
-            <IconButton color="primary" onClick={() => dispatch(openItemForm({ item }))}>
+            <IconButton color="primary" onClick={() => handleEditItem(item)}>
                 <EditIcon />
             </IconButton>
-            <IconButton onClick={() => dispatch(openDeleteItemForm({ item }))}>
+            <IconButton onClick={() => handleDeleteItem(item)}>
                 <DeleteIcon />
             </IconButton>
         </>
 
-    return (<Draggable key={item._id} draggableId={item._id} index={index}>
+    return <Draggable key={item._id} draggableId={item._id} index={index}>
         {(draggableProvided: DraggableProvided) => {
             return (
                 <TableRow ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}>
@@ -100,7 +87,7 @@ const TableItem = ({ item, index, headers }: TableItemProps) => {
                 </TableRow>
             );
         }}
-    </Draggable>);
+    </Draggable>
 }
 
 export default TableItem;

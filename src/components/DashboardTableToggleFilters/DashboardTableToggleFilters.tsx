@@ -51,16 +51,14 @@ const DashboardTableToggleFilters = ({ setDataTable, data }: DashboardTableToggl
         dispatch(chooseDashboardFilter(filter.filter));
     }
 
-    return (
-        <Box display="flex" marginTop={"2%"}>
-            {
-                filters.map((filter) =>
-                    <Button key={filter.filter} sx={{ mr: "1%", fontSize: "14px", height: "80%", backgroundColor: filter.active ? "#b599b0" : "#78536d" }} variant="contained"
-                        onClick={() => onClickFilter(filter)}>{filter.filter}</Button>
-                )
-            }
-        </Box>
-    );
+    return <Box display="flex" marginTop={"2%"}>
+        {
+            filters.map((filter) =>
+                <Button key={filter.filter} sx={{ mr: "1%", fontSize: "14px", height: "80%", backgroundColor: filter.active ? "#b599b0" : "#78536d" }} variant="contained"
+                    onClick={() => onClickFilter(filter)}>{filter.filter}</Button>
+            )
+        }
+    </Box>
 };
 
 export default DashboardTableToggleFilters;

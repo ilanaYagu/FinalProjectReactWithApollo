@@ -26,25 +26,23 @@ const TasksTableFilters = ({ setTasks, data }: TasksTableFiltersProps) => {
             (priorityFilter === PriorityFilterType.All || task.priority as string === priorityFilter)
             && (statusFilter === StatusFilterType.All || task.status as string === statusFilter))
 
-    return (
-        <>
-            <Select sx={{ mt: "1.5%", mr: "1%" }} size="small" value={statusFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseStatusTasksFilter(event.target.value as StatusFilterType))}>
-                {
-                    Object.values(StatusFilterType).map((value) => {
-                        return <MenuItem key={value} value={value}>{value}</MenuItem>
-                    })
-                }
-            </Select>
+    return <>
+        <Select sx={{ mt: "1.5%", mr: "1%" }} size="small" value={statusFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseStatusTasksFilter(event.target.value as StatusFilterType))}>
+            {
+                Object.values(StatusFilterType).map((value) => {
+                    return <MenuItem key={value} value={value}>{value}</MenuItem>
+                })
+            }
+        </Select>
 
-            <Select sx={{ mt: "1.5%" }} size="small" value={priorityFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(choosePriorityTasksFilter(event.target.value as PriorityFilterType))}  >
-                {
-                    Object.values(PriorityFilterType).map((value) => {
-                        return <MenuItem key={value} value={value}>{value}</MenuItem>
-                    })
-                }
-            </Select>
-        </>
-    );
+        <Select sx={{ mt: "1.5%" }} size="small" value={priorityFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(choosePriorityTasksFilter(event.target.value as PriorityFilterType))}  >
+            {
+                Object.values(PriorityFilterType).map((value) => {
+                    return <MenuItem key={value} value={value}>{value}</MenuItem>
+                })
+            }
+        </Select>
+    </>
 };
 
 export default TasksTableFilters;

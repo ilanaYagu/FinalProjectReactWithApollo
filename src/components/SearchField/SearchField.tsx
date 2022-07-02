@@ -5,11 +5,7 @@ interface SearchFieldProps {
     id?: string;
 }
 
-function SearchField({ setSearch, id }: SearchFieldProps) {
-
-    return (
-        <TextField id={id} label="Search" variant="standard" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} />
-    );
-};
+const SearchField = ({ setSearch, id }: SearchFieldProps) =>
+    <TextField id={id} label="Search" variant="standard" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} />
 
 export default SearchField;

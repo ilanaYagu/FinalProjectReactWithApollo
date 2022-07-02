@@ -1,10 +1,18 @@
-import { EventInputs, TaskInputs } from "./ItemForm";
 import validator from "validator";
 import { priorityOptions, statusesOptions } from "./TaskForm";
-import { PriorityType } from "../../generated/graphql";
+import { Event, PriorityType, Task } from "../../generated/graphql";
 
-export const validateTaskInputs = (taskInputs: TaskInputs): boolean => {
+export const validateBasicInputs = (basicInputs: Event | Task) => {
+    if (validator.trim(basicInputs.title) === "" || validator.trim(basicInputs.description) === "") {
+        alert("Please fill the Required Fields");
+        return false;
+    }
+    return true;
+}
+
+export const validateTaskInputs = (taskInputs: Task): boolean => {
     let isValid = true;
+    isValid = validateBasicInputs(taskInputs);
     if (taskInputs.priority === PriorityType.Top && validator.trim(taskInputs.untilDate) === "") {
         alert("Please check your until date, it is an top task!");
         isValid = false;
@@ -19,8 +27,9 @@ export const validateTaskInputs = (taskInputs: TaskInputs): boolean => {
     return isValid;
 }
 
-export const validateEventInputs = (eventInputs: EventInputs): boolean => {
+export const validateEventInputs = (eventInputs: Event): boolean => {
     let isValid = true;
+    isValid = validateBasicInputs(eventInputs);
     if (validator.trim(eventInputs.beginningTime) === "" || validator.trim(eventInputs.endingTime) === "" || new Date(eventInputs.beginningTime) > new Date(eventInputs.endingTime)) {
         alert("Please check your beginning and ending times");
         isValid = false;

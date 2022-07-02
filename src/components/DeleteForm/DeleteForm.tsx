@@ -4,17 +4,14 @@ import { useEscButtonHook } from "../../listeners-hooks/useEscButtonHook";
 import { Event, Task, useDeleteEventMutation, useDeleteTaskMutation } from "../../generated/graphql";
 import { GET_ALL_EVENTS, GET_ALL_TASKS, GET_TODAY_TASKS_AND_EVENTS } from "../../graphql/Queries";
 import { ItemType } from "../../types/managementTableTypes";
-import { closeDeleteItemForm } from "../../feature/modalsSlice";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../app/store";
 
 interface DeleteItemFormProps {
     item: Event | Task;
     open: boolean;
+    handleClose: () => void;
 }
 
-function DeleteItemForm({ item, open }: DeleteItemFormProps) {
-    const dispatch = useDispatch<AppDispatch>();
+function DeleteItemForm({ item, open, handleClose }: DeleteItemFormProps) {
 
     const [deleteEvent] = useDeleteEventMutation({
         update: (cache, { data }) => {
@@ -46,30 +43,28 @@ function DeleteItemForm({ item, open }: DeleteItemFormProps) {
     const handleDelete = (): void => {
         item.__typename === ItemType.Task ?
             deleteTask({ variables: { id: item._id } }) : deleteEvent({ variables: { id: item._id } });
-        dispatch(closeDeleteItemForm())
+        handleClose();
     }
 
     useEnterButtonHook({ handleConfirm: handleDelete });
-    useEscButtonHook({ handleCancel: () => dispatch(closeDeleteItemForm()) });
+    useEscButtonHook({ handleCancel: handleClose });
 
-    return (
-        <Dialog open={open} >
-            <DialogTitle>Delete</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    Are you sure you want to delete "{item.title}"?
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions sx={{ justifyContent: "center", mt: "8%" }}>
-                <Button onClick={() => dispatch(closeDeleteItemForm())} variant="outlined" color="secondary" >
-                    Cancel
-                </Button>
-                <Button type="submit" variant="contained" onClick={() => handleDelete()} >
-                    Delete
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
+    return <Dialog open={open} >
+        <DialogTitle>Delete</DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                Are you sure you want to delete "{item.title}"?
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", mt: "8%" }}>
+            <Button onClick={handleClose} variant="outlined" color="secondary" >
+                Cancel
+            </Button>
+            <Button type="submit" variant="contained" onClick={() => handleDelete()} >
+                Delete
+            </Button>
+        </DialogActions>
+    </Dialog>
 };
 
 export default DeleteItemForm;

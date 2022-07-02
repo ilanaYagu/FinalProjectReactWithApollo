@@ -6,8 +6,6 @@ import TableItem from "./TableItem";
 import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
 import { Event, Task } from "../../generated/graphql";
 import DeleteItemForm from "../DeleteForm/DeleteForm";
-import { RootState } from "../../app/store";
-import { useSelector } from "react-redux";
 
 const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
 export const customSortProperties: CustomSortProperties[] = [{ sortField: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
@@ -24,14 +22,15 @@ interface ItemsTableProps {
     setItems(newItems: (Event | Task)[]): void;
     headers: TableHeaders<Event | Task>;
     search: string;
+    handleEditItem(task: Task | Event): void;
 }
 
-const ItemsTable = ({ items, setItems, headers, search }: ItemsTableProps) => {
+const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortField>("");
     const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Nothing);
-    const showDeleteItemForm = useSelector((state: RootState) => state.modals.deleteItemForm);
+    const [deleteItemForm, setDeleteItemForm] = useState<{ open: boolean; item?: Task | Event }>();
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value));
@@ -77,7 +76,8 @@ const ItemsTable = ({ items, setItems, headers, search }: ItemsTableProps) => {
         </DragDropContext>
 
     const getRow = (item: Event | Task, index: number) =>
-        <TableItem key={index} item={item} index={index} headers={headers} />
+        <TableItem key={index} handleEditItem={handleEditItem} handleDeleteItem={(item: Task | Event) => setDeleteItemForm({ open: true, item: item })}
+            item={item} index={index} headers={headers} />
 
     const handleDragEnd = (result: DropResult) => {
         if (!result.destination || result.destination.index === result.source.index) {
@@ -103,21 +103,18 @@ const ItemsTable = ({ items, setItems, headers, search }: ItemsTableProps) => {
                 rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage: number) => setPage(newPage)} onRowsPerPageChange={handleChangeRowsPerPage} />
         </>
 
-
-    return (
-        <>
-            {
-                items.length > 0 ?
-                    getTable()
-                    :
-                    <Box sx={{ mt: "10%", textAlign: "center" }}>
-                        <h1>NO ITEMS</h1>
-                    </Box>
-            }
-            {showDeleteItemForm.open && showDeleteItemForm.item &&
-                <DeleteItemForm item={showDeleteItemForm.item} open={showDeleteItemForm.open} />}
-        </>
-    );
+    return <>
+        {
+            items.length > 0 ?
+                getTable()
+                :
+                <Box sx={{ mt: "10%", textAlign: "center" }}>
+                    <h1>NO ITEMS</h1>
+                </Box>
+        }
+        {deleteItemForm?.open && deleteItemForm?.item &&
+            <DeleteItemForm handleClose={() => setDeleteItemForm({ open: false })} item={deleteItemForm.item} open={deleteItemForm.open} />}
+    </>
 }
 
 export default ItemsTable;
