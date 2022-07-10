@@ -23,7 +23,7 @@ const ManagementPage = ({ type }: ManagementPageProps) => {
     const searchInputRef = useRef<HTMLDivElement>(null);
     useSearchShortcutHook({ searchInputRef });
 
-    const getTypeManagementPage = () =>
+    const getManagementPage = () =>
         !type ?
             <TodayManagement setItemForm={setItemForm} search={search} />
             :
@@ -38,7 +38,7 @@ const ManagementPage = ({ type }: ManagementPageProps) => {
         <Button variant="contained" sx={addButtonStyle} onClick={() => setItemForm({ open: true })} startIcon={type === ItemType.Event ? <CalendarMonthRoundedIcon /> : <AddTaskIcon />}>
             Add {type}
         </Button>
-        {getTypeManagementPage()}
+        {getManagementPage()}
         {
             itemForm?.open &&
             <ItemDialog handleClose={() => setItemForm({ open: false })} itemToUpdate={itemForm?.item} type={type} />

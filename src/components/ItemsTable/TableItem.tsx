@@ -22,7 +22,10 @@ const otherColumnProperties: OtherColumnProperties<Task> | OtherColumnProperties
     location: "Location"
 };
 
-const tableCellStyle: SxProps = { whiteSpace: "nowrap", width: "10%" };
+const tableCellStyle: SxProps = {
+    whiteSpace: "nowrap",
+    width: "10%"
+};
 const otherCellBoxStyle: SxProps = { margin: "6%" };
 const otherCellTitleStyle: SxProps = { textDecoration: "underline", fontStyle: "italic" };
 

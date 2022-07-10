@@ -12,7 +12,7 @@ export const customSortProperties: CustomSortProperties[] = [{ sortField: "estim
 export enum SortOrderType {
     Asc = "asc",
     Desc = "desc",
-    Non = ""
+    None = ""
 }
 export type SortField = keyof TableHeaders<Event | Task> | "";
 
@@ -32,7 +32,7 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortField>("");
-    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Non);
+    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.None);
     const [deleteItemForm, setDeleteItemForm] = useState<{ open: boolean; item?: Task | Event }>();
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +55,7 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
                             unsortableHeaders.includes(key as ExternalHeaders) ?
                                 header
                                 :
-                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrderType.Non ? undefined : sortOrder} onClick={() => handleSort(key as SortField)}>
+                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrderType.None ? undefined : sortOrder} onClick={() => handleSort(key as SortField)}>
                                     {header}
                                 </TableSortLabel>
                         }
