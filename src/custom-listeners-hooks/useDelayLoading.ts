@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 
-interface useLoadingDataProps {
+interface useDelayLoadingProps {
     loading: boolean;
     setLoading(loading: boolean): void;
 }
 
-export const useLoadingDataHook = ({ loading, setLoading }: useLoadingDataProps) => {
+export const useDelayLoadingHook = ({ loading, setLoading }: useDelayLoadingProps) => {
 
     useEffect(() => {
         setTimeout(() => {

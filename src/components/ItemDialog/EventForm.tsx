@@ -1,4 +1,4 @@
-import { Box, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Box, DialogContent, DialogContentText, DialogTitle, SxProps } from "@mui/material";
 import { Color, ColorPicker, createColor } from "material-ui-color";
 import InvitedGuestsField from "./custom-form-fields/InvitedGuestsField";
 import DateTextField from "./custom-form-fields/DateTextField";
@@ -18,8 +18,8 @@ interface EventFormProps {
     handleClose: () => void;
 }
 
-const colorPickerBox = { display: "flex", marginBottom: "5%" };
-const colorPickerTitle = { marginTop: "2%", marginRight: "3%" };
+const colorPickerBox: SxProps = { display: "flex", marginBottom: "5%" };
+const colorPickerTitle: SxProps = { marginTop: "2%", marginRight: "3%" };
 
 const EventForm = ({ itemToUpdate, handleClose }: EventFormProps) => {
     const [createEvent] = useCreateEventMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }, { query: GET_ALL_EVENTS }] });

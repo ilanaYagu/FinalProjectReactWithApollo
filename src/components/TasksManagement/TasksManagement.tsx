@@ -1,12 +1,11 @@
 import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ItemsTable from "../ItemsTable/ItemsTable";
 import { Task, useGetTasksQuery } from "../../generated/graphql";
 import TasksTableFilters from "../TasksTableFilters/TasksTableFilters";
 import { columnsForTasksTable } from "../../table-constants";
-import { ItemType } from "../../types/managementTableTypes";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import { useLoadingDataHook } from "../../custom-listeners-hooks/useLoadingDataHook";
+import { useDelayLoadingHook } from "../../custom-listeners-hooks/useDelayLoading";
 
 interface TasksManagementProps {
     search: string;
@@ -17,7 +16,7 @@ const TasksManagement = ({ search, setTaskForm }: TasksManagementProps) => {
     const tasksFetchRes = useGetTasksQuery()
     const [filteredTasks, setFilteredTasks] = useState<Task[]>(tasksFetchRes.data?.tasks || []);
     const [loading, setLoading] = useState<boolean>(tasksFetchRes.loading);
-    useLoadingDataHook({ loading: tasksFetchRes.loading, setLoading });
+    useDelayLoadingHook({ loading: tasksFetchRes.loading, setLoading });
 
     const getTasksView = () =>
         loading ?
@@ -25,7 +24,7 @@ const TasksManagement = ({ search, setTaskForm }: TasksManagementProps) => {
             :
             <>
                 <h4>Total Tasks: {tasksFetchRes.data?.tasks.length}</h4>
-                <ItemsTable handleEditItem={(task: Task) => setTaskForm({ open: true, item: task })} type={ItemType.Task} headers={columnsForTasksTable} items={filteredTasks}
+                <ItemsTable handleEditItem={(task: Task) => setTaskForm({ open: true, item: task })} headers={columnsForTasksTable} items={filteredTasks}
                     setItems={(newItems: Task[]) => setFilteredTasks(newItems)} search={search} />
             </>
 

@@ -4,7 +4,7 @@ import { Event, Task, useGetTodayTasksAndEventQuery } from "../../generated/grap
 import { columnsForTodayTasksAndEventsTable } from "../../table-constants";
 import DashboardTableToggleFilters from "../DashboardTableToggleFilters/DashboardTableToggleFilters";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import { useLoadingDataHook } from "../../custom-listeners-hooks/useLoadingDataHook";
+import { useDelayLoadingHook } from "../../custom-listeners-hooks/useDelayLoading";
 
 interface TodayManagementProps {
     search: string;
@@ -15,7 +15,7 @@ const TodayManagement = ({ search, setItemForm }: TodayManagementProps) => {
     const todayFetchRes = useGetTodayTasksAndEventQuery();
     const [filteredTodays, setFilteredTodays] = useState<(Event | Task)[] | undefined>(todayFetchRes.data ? [...todayFetchRes.data?.todayEvents, ...todayFetchRes.data?.todayTasks] : undefined);
     const [loading, setLoading] = useState<boolean>(todayFetchRes.loading);
-    useLoadingDataHook({ loading: todayFetchRes.loading, setLoading });
+    useDelayLoadingHook({ loading: todayFetchRes.loading, setLoading });
 
     const getItemsView = () =>
         loading ?

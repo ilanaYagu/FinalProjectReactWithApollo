@@ -21,7 +21,6 @@ const tablePaginationStyle: SxProps = { marginTop: "5%", display: "inline-flex" 
 const noItemsBoxStyle: SxProps = { mt: "10%", textAlign: "center" };
 
 interface ItemsTableProps {
-    type?: ItemType;
     items: (Event | Task)[];
     setItems(newItems: (Event | Task)[]): void;
     headers: TableHeaders<Event | Task>;

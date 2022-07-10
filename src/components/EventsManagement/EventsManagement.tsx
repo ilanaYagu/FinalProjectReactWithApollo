@@ -4,9 +4,8 @@ import ItemsTable from "../ItemsTable/ItemsTable";
 import { Event, useGetEventsQuery } from "../../generated/graphql";
 import { columnsForEventsTable } from "../../table-constants";
 import EventsTableFilters from "../EventsTableFilters/EventsTableFilters";
-import { ItemType } from "../../types/managementTableTypes";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import { useLoadingDataHook } from "../../custom-listeners-hooks/useLoadingDataHook";
+import { useDelayLoadingHook } from "../../custom-listeners-hooks/useDelayLoading";
 
 interface EventsManagementProps {
     search: string;
@@ -17,7 +16,7 @@ const EventsManagement = ({ search, setEventForm }: EventsManagementProps) => {
     const eventsFetchRes = useGetEventsQuery();
     const [filteredEvents, setFilteredEvents] = useState<Event[]>(eventsFetchRes.data?.events || []);
     const [loading, setLoading] = useState<boolean>(eventsFetchRes.loading);
-    useLoadingDataHook({ loading: eventsFetchRes.loading, setLoading });
+    useDelayLoadingHook({ loading: eventsFetchRes.loading, setLoading });
 
     const getEventsView = () =>
         loading ?
@@ -25,7 +24,7 @@ const EventsManagement = ({ search, setEventForm }: EventsManagementProps) => {
             :
             <>
                 <h4>Total Events: {eventsFetchRes.data?.events?.length}</h4>
-                <ItemsTable handleEditItem={(event: Event) => setEventForm({ open: true, item: event })} type={ItemType.Event} headers={columnsForEventsTable} items={filteredEvents} setItems={(newItems: Event[]) => setFilteredEvents(newItems)}
+                <ItemsTable handleEditItem={(event: Event) => setEventForm({ open: true, item: event })} headers={columnsForEventsTable} items={filteredEvents} setItems={(newItems: Event[]) => setFilteredEvents(newItems)}
                     search={search} />
             </>
 
