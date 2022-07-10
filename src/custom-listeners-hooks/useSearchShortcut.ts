@@ -1,14 +1,18 @@
 
-import { useEffect } from "react";
+import { RefObject, useEffect } from "react";
 
-export const useSearchShortcutHook = () => {
+interface UseSearchShortcutProps {
+    searchInputRef?: RefObject<HTMLDivElement> | null
+}
+
+export const useSearchShortcutHook = ({ searchInputRef }: UseSearchShortcutProps) => {
 
     useEffect(() => {
         const listener = (event: Event) => {
             if (event instanceof KeyboardEvent) {
                 if (event.ctrlKey && event.code === "KeyF") {
                     event.preventDefault();
-                    (document.querySelector("#search") as HTMLElement)?.focus();
+                    searchInputRef?.current?.focus();
                 }
             }
         };

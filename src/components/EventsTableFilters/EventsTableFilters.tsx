@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { isFutureDate, isToday } from '../../date-utils';
+import { MenuItem, Select, SelectChangeEvent, SxProps } from '@mui/material';
+import { isFutureDate, isToday } from '../../utils/date-utils';
 import { Event } from '../../generated/graphql';
 import { AppDispatch, RootState } from '../../app/store';
 import { useSelector } from 'react-redux';
 import { BeginningTimeEventFilterType, chooseBeginningTimeEventsFilter } from '../../feature/activeFiltersSlice';
 import { useDispatch } from 'react-redux';
+
+const filterSelectStyle: SxProps = { mt: "1.5%" };
 
 interface EventsTableFiltersProps {
     setEvents(events: Event[]): void;
@@ -34,7 +36,7 @@ const EventsTableFilters = ({ setEvents, data }: EventsTableFiltersProps) => {
             }
         })
 
-    return <Select sx={{ mt: "1.5%" }} size="small" value={beginningTimeFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseBeginningTimeEventsFilter(event.target.value as BeginningTimeEventFilterType))}>
+    return <Select sx={filterSelectStyle} size="small" value={beginningTimeFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseBeginningTimeEventsFilter(event.target.value as BeginningTimeEventFilterType))}>
         {
             Object.values(BeginningTimeEventFilterType).map((value) => {
                 return <MenuItem key={value} value={value}>{value}</MenuItem>

@@ -1,5 +1,5 @@
 import { Event, Task } from '../../generated/graphql';
-import FormTextField from './custom-form-fields/FormTextFiled';
+import FormTextField from './custom-form-fields/FormTextField';
 
 interface BasicItemFieldsProps {
     setInputs(newEventInputs: Task | Event): void;

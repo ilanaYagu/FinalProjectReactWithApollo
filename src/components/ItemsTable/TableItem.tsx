@@ -1,4 +1,4 @@
-import { Box, IconButton, TableCell, TableRow } from '@mui/material';
+import { Box, IconButton, SxProps, TableCell, TableRow } from '@mui/material';
 import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -22,6 +22,10 @@ const otherColumnProperties: OtherColumnProperties<Task> | OtherColumnProperties
     location: "Location"
 };
 
+const tableCellStyle: SxProps = { whiteSpace: "nowrap", width: "10%" };
+const otherCellBoxStyle: SxProps = { margin: "6%" };
+const otherCellTitleStyle: SxProps = { textDecoration: "underline", fontStyle: "italic" };
+
 interface TableItemProps {
     item: Event | Task;
     index: number;
@@ -33,7 +37,7 @@ interface TableItemProps {
 const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: TableItemProps) => {
 
     const getTableCell = (headerKey: string) =>
-        <TableCell key={headerKey} sx={{ whiteSpace: "nowrap", width: "10%" }} align="center">
+        <TableCell key={headerKey} sx={tableCellStyle} align="center">
             {getTableCellContent(headerKey)}
         </TableCell>
 
@@ -55,8 +59,8 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
             {
                 Object.entries(otherColumnProperties).map(([key, value]) =>
                     item[key as keyof (Event | Task)] && !Object.keys(headers).includes(key) ?
-                        <Box key={key} sx={{ margin: "6%" }}>
-                            <Box sx={{ textDecoration: "underline", fontStyle: "italic" }}>{value}</Box>
+                        <Box key={key} sx={otherCellBoxStyle}>
+                            <Box sx={otherCellTitleStyle}>{value}</Box>
                             {item[key as keyof (Event | Task)]}
                         </Box>
                         :

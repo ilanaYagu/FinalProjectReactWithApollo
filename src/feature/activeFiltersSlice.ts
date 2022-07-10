@@ -48,11 +48,7 @@ const ActiveFiltersSlice = createSlice({
     initialState: initialActiveFiltersState,
     reducers: {
         chooseDashboardFilter: (state, action: PayloadAction<TodayTableFilterType>): void => {
-            if (state.dashboardFilter === action.payload) {
-                state.dashboardFilter = TodayTableFilterType.All
-            } else {
-                state.dashboardFilter = action.payload
-            }
+            state.dashboardFilter = state.dashboardFilter === action.payload ? TodayTableFilterType.All : action.payload;
         },
         chooseStatusTasksFilter: (state, action: PayloadAction<StatusFilterType>): void => {
             state.statusTasksFilter = action.payload;

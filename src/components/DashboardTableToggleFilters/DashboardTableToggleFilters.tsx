@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, SxProps } from '@mui/material';
 import { Event, PriorityType, StatusType, Task } from '../../generated/graphql';
 import { AppDispatch, RootState } from '../../app/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { chooseDashboardFilter, TodayTableFilterType } from "../../feature/activeFiltersSlice"
 import { ItemType } from '../../types/managementTableTypes';
+
+const filterButtonStyle: SxProps = { mr: "1%", fontSize: "14px", height: "80%" }
 
 interface DashboardTableFilter {
     active: boolean;
@@ -34,7 +36,7 @@ const DashboardTableToggleFilters = ({ setDataTable, data }: DashboardTableToggl
 
     const isItemMatchFilters = (item: (Task | Event)): boolean => {
         let matchFilter = true;
-        filters.map((filter) => {
+        filters.forEach((filter) => {
             if (filter.active) {
                 matchFilter = matchFilter && filter.checkMatch(item);
             }
@@ -42,19 +44,19 @@ const DashboardTableToggleFilters = ({ setDataTable, data }: DashboardTableToggl
         return matchFilter;
     }
 
-    const onClickFilter = (filter: DashboardTableFilter): void => {
-        const newActiveStatus = !filter.active;
-        setFilters(filters.map((nfilter: DashboardTableFilter) => {
-            nfilter.active = filter.filter === nfilter.filter ? newActiveStatus : false;
-            return nfilter;
+    const onClickFilter = (clickedFilter: DashboardTableFilter): void => {
+        const newActiveStatus = !clickedFilter.active;
+        setFilters(filters.map((filter: DashboardTableFilter) => {
+            filter.active = clickedFilter.filter === filter.filter ? newActiveStatus : false;
+            return filter;
         }));
-        dispatch(chooseDashboardFilter(filter.filter));
+        dispatch(chooseDashboardFilter(clickedFilter.filter));
     }
 
     return <Box display="flex" marginTop={"2%"}>
         {
             filters.map((filter) =>
-                <Button key={filter.filter} sx={{ mr: "1%", fontSize: "14px", height: "80%", backgroundColor: filter.active ? "#b599b0" : "#78536d" }} variant="contained"
+                <Button key={filter.filter} sx={{ ...filterButtonStyle, backgroundColor: filter.active ? "#b599b0" : "#78536d" }} variant="contained"
                     onClick={() => onClickFilter(filter)}>{filter.filter}</Button>
             )
         }

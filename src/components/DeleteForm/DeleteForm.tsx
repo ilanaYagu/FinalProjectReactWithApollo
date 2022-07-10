@@ -1,9 +1,12 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { useEnterButtonHook } from "../../listeners-hooks/useEnterButtonHook";
-import { useEscButtonHook } from "../../listeners-hooks/useEscButtonHook";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, SxProps } from "@mui/material";
+import { useEnterButtonHook } from "../../custom-listeners-hooks/useEnterButtonHook";
+import { useEscButtonHook } from "../../custom-listeners-hooks/useEscButtonHook";
 import { Event, Task, useDeleteEventMutation, useDeleteTaskMutation } from "../../generated/graphql";
 import { GET_ALL_EVENTS, GET_ALL_TASKS, GET_TODAY_TASKS_AND_EVENTS } from "../../graphql/Queries";
 import { ItemType } from "../../types/managementTableTypes";
+
+
+const dialogActionsStyle: SxProps = { justifyContent: "center", mt: "8%" };
 
 interface DeleteItemFormProps {
     item: Event | Task;
@@ -12,33 +15,8 @@ interface DeleteItemFormProps {
 }
 
 function DeleteItemForm({ item, open, handleClose }: DeleteItemFormProps) {
-
-    const [deleteEvent] = useDeleteEventMutation({
-        update: (cache, { data }) => {
-            const cacheDataAllEvents = cache.readQuery({ query: GET_ALL_EVENTS }) as { events: Event[]; };
-            const cacheTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayEvents: Event[]; todayTasks: Task[]; };
-            if (data) {
-                cacheDataAllEvents && cache.writeQuery({ query: GET_ALL_EVENTS, data: { events: cacheDataAllEvents.events.filter((event) => event._id !== data.deleteEvent?._id) } });
-                cacheTodayData && cache.writeQuery({
-                    query: GET_TODAY_TASKS_AND_EVENTS,
-                    data: { todayEvents: cacheTodayData.todayEvents.filter((todayEvent) => todayEvent._id !== data.deleteEvent?._id), todayTasks: cacheTodayData.todayTasks }
-                });
-            }
-        }
-    });
-    const [deleteTask] = useDeleteTaskMutation({
-        update: (cache, { data }) => {
-            const cacheDataAllTasks = cache.readQuery({ query: GET_ALL_TASKS }) as { tasks: Task[]; };
-            const cacheTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayEvents: Event[]; todayTasks: Task[]; };
-            if (data) {
-                cacheDataAllTasks && cacheDataAllTasks && cache.writeQuery({ query: GET_ALL_TASKS, data: { tasks: cacheDataAllTasks.tasks.filter((task) => task._id !== data.deleteTask?._id) } });
-                cacheTodayData && cache.writeQuery({
-                    query: GET_TODAY_TASKS_AND_EVENTS,
-                    data: { todayTasks: cacheTodayData.todayTasks.filter((todayTask) => todayTask._id !== data.deleteTask?._id), todayEvents: cacheTodayData.todayEvents }
-                });
-            }
-        }
-    });
+    const [deleteEvent] = useDeleteEventMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }, { query: GET_ALL_EVENTS }] });
+    const [deleteTask] = useDeleteTaskMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }, { query: GET_ALL_TASKS }] });
 
     const handleDelete = (): void => {
         item.__typename === ItemType.Task ?
@@ -56,11 +34,11 @@ function DeleteItemForm({ item, open, handleClose }: DeleteItemFormProps) {
                 Are you sure you want to delete "{item.title}"?
             </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", mt: "8%" }}>
+        <DialogActions sx={dialogActionsStyle}>
             <Button onClick={handleClose} variant="outlined" color="secondary" >
                 Cancel
             </Button>
-            <Button type="submit" variant="contained" onClick={() => handleDelete()} >
+            <Button type="submit" variant="contained" onClick={handleDelete}>
                 Delete
             </Button>
         </DialogActions>

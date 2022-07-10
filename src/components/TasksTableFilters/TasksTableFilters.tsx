@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { useDispatch } from 'react-redux';
 
+const filterSelectStyle = { mt: "1.5%", mr: "1%" };
 interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
     data?: Task[];
@@ -27,7 +28,7 @@ const TasksTableFilters = ({ setTasks, data }: TasksTableFiltersProps) => {
             && (statusFilter === StatusFilterType.All || task.status as string === statusFilter))
 
     return <>
-        <Select sx={{ mt: "1.5%", mr: "1%" }} size="small" value={statusFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseStatusTasksFilter(event.target.value as StatusFilterType))}>
+        <Select sx={filterSelectStyle} size="small" value={statusFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(chooseStatusTasksFilter(event.target.value as StatusFilterType))}>
             {
                 Object.values(StatusFilterType).map((value) => {
                     return <MenuItem key={value} value={value}>{value}</MenuItem>
@@ -35,7 +36,7 @@ const TasksTableFilters = ({ setTasks, data }: TasksTableFiltersProps) => {
             }
         </Select>
 
-        <Select sx={{ mt: "1.5%" }} size="small" value={priorityFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(choosePriorityTasksFilter(event.target.value as PriorityFilterType))}  >
+        <Select sx={filterSelectStyle} size="small" value={priorityFilter} onChange={(event: SelectChangeEvent<string>) => dispatch(choosePriorityTasksFilter(event.target.value as PriorityFilterType))}  >
             {
                 Object.values(PriorityFilterType).map((value) => {
                     return <MenuItem key={value} value={value}>{value}</MenuItem>

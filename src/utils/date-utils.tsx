@@ -1,5 +1,5 @@
-import { Event, Task } from "./generated/graphql";
-import { ItemType } from "./types/managementTableTypes";
+import { Event, Task } from "../generated/graphql";
+import { ItemType } from "../types/managementTableTypes";
 
 export const isFutureDate = (date: Date) => {
     return date.getTime() > new Date().getTime()

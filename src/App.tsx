@@ -4,12 +4,11 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
 import ManagementPage from "./pages/ManagementPage";
-import { columnsForEventsTable, columnsForTasksTable, columnsForTodayTasksAndEventsTable } from "./constants";
 import { ItemType } from './types/managementTableTypes';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Notifications } from 'react-push-notification';
 import addNotification from 'react-push-notification';
-import { useGetEventsQuery, useGetTasksQuery, useOnIncomingEventSubscription } from './generated/graphql';
+import { useOnIncomingEventSubscription } from './generated/graphql';
 
 const theme = createTheme({
   palette: {

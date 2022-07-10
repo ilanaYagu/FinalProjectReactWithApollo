@@ -1,17 +1,22 @@
-import { Autocomplete, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextareaAutosize, TextField } from "@mui/material";
+import { Autocomplete, DialogContent, DialogContentText, DialogTitle, styled, TextField } from "@mui/material";
 import DateTextField from './custom-form-fields/DateTextField';
 import { PriorityType, StatusType, Task, useCreateTaskMutation, useUpdateTaskMutation } from "../../generated/graphql";
 import { GET_ALL_TASKS, GET_TODAY_TASKS_AND_EVENTS } from "../../graphql/Queries";
-import { filterTodayItems } from "../../date-utils";
 import { useState } from "react";
 import { validateTaskInputs } from "./item-form-utils";
-import { useEnterButtonHook } from "../../listeners-hooks/useEnterButtonHook";
-import { useEscButtonHook } from "../../listeners-hooks/useEscButtonHook";
+import { useEnterButtonHook } from "../../custom-listeners-hooks/useEnterButtonHook";
+import { useEscButtonHook } from "../../custom-listeners-hooks/useEscButtonHook";
 import BasicItemFields from "./BasicItemFields";
-import FormTextField from "./custom-form-fields/FormTextFiled";
+import FormTextField from "./custom-form-fields/FormTextField";
+import CustomDialogActions from "./CustomDialogActions";
 
 export const statusesOptions: string[] = Object.values(StatusType);
 export const priorityOptions: string[] = Object.values(PriorityType);
+
+const FormAutocomplete = styled(Autocomplete)({
+    marginTop: "3%",
+    width: "85%"
+})
 
 interface TaskFormProps {
     itemToUpdate?: Task;
@@ -19,22 +24,7 @@ interface TaskFormProps {
 }
 
 const TaskForm = ({ itemToUpdate, handleClose }: TaskFormProps) => {
-
-    const [createTask] = useCreateTaskMutation({
-        update: (cache, { data }) => {
-            const cacheDataAllTasks = cache.readQuery({ query: GET_ALL_TASKS }) as { tasks: Task[]; };
-            const cacheTodayData = cache.readQuery({ query: GET_TODAY_TASKS_AND_EVENTS }) as { todayTasks: Task[]; todayEvents: Event[] };
-            if (data?.createTask) {
-                cacheDataAllTasks && cache.writeQuery({ query: GET_ALL_TASKS, data: { tasks: [...cacheDataAllTasks.tasks, data.createTask] } });
-                if (cacheTodayData && filterTodayItems([data.createTask]).length) {
-                    cache.writeQuery({
-                        query: GET_TODAY_TASKS_AND_EVENTS,
-                        data: { todayEvents: cacheTodayData.todayEvents, todayTasks: [...cacheTodayData.todayTasks, data.createTask], }
-                    });
-                }
-            }
-        }
-    });
+    const [createTask] = useCreateTaskMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }, { query: GET_ALL_TASKS }] });
     const [updateTask] = useUpdateTaskMutation({ refetchQueries: [{ query: GET_TODAY_TASKS_AND_EVENTS }] });
 
     let [taskInputs, setTaskInputs] = useState<Task>({
@@ -58,7 +48,7 @@ const TaskForm = ({ itemToUpdate, handleClose }: TaskFormProps) => {
     useEscButtonHook({ handleCancel: handleClose });
 
     const getAutoComplete = (field: keyof Task, options: string[], label: string) =>
-        <Autocomplete sx={{ mt: "3%", width: "85%" }} freeSolo value={taskInputs[field]} options={options}
+        <FormAutocomplete freeSolo value={taskInputs[field]} options={options}
             onChange={(event: React.FormEvent) => {
                 setTaskInputs({ ...taskInputs, [field]: (event.target as HTMLInputElement).textContent })
             }}
@@ -66,12 +56,6 @@ const TaskForm = ({ itemToUpdate, handleClose }: TaskFormProps) => {
                 <TextField {...params} label={label} InputProps={{ ...params.InputProps, type: 'search' }} />
             )}
         />
-
-    const getDialogActions = (): JSX.Element =>
-        <DialogActions sx={{ justifyContent: "center", mt: "8%" }}>
-            <Button onClick={handleClose} color="secondary" variant="outlined"> Cancel </Button>
-            <Button onClick={formSubmit} color="primary" type="submit" variant="contained"> {itemToUpdate ? "Update" : "Create"} </Button>
-        </DialogActions>
 
     return <>
         <DialogTitle>{`${itemToUpdate ? "Update" : "Create"} Task`}</DialogTitle>
@@ -91,7 +75,7 @@ const TaskForm = ({ itemToUpdate, handleClose }: TaskFormProps) => {
                 </>
             }
         </DialogContent>
-        {getDialogActions()}
+        <CustomDialogActions handleClose={handleClose} formSubmit={formSubmit} action={itemToUpdate ? "Update" : "Create"} />
     </>;
 };
 

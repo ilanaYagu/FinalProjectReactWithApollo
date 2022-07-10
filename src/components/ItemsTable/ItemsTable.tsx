@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { Box, SxProps, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import { ExternalHeaders, ItemType, TableHeaders } from "../../types/managementTableTypes";
 import TableItem from "./TableItem";
@@ -12,9 +12,13 @@ export const customSortProperties: CustomSortProperties[] = [{ sortField: "estim
 export enum SortOrderType {
     Asc = "asc",
     Desc = "desc",
-    Nothing = ""
+    Non = ""
 }
 export type SortField = keyof TableHeaders<Event | Task> | "";
+
+const headerCellStyle: SxProps = { fontWeight: "bold", fontSize: "18px", whiteSpace: "nowrap" };
+const tablePaginationStyle: SxProps = { marginTop: "5%", display: "inline-flex" };
+const noItemsBoxStyle: SxProps = { mt: "10%", textAlign: "center" };
 
 interface ItemsTableProps {
     type?: ItemType;
@@ -29,7 +33,7 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortField>("");
-    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Nothing);
+    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Non);
     const [deleteItemForm, setDeleteItemForm] = useState<{ open: boolean; item?: Task | Event }>();
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,12 +51,12 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
         <TableHead>
             <TableRow>
                 {Object.entries(headers).map(([key, header]) =>
-                    <TableCell key={key} sx={{ fontWeight: "bold", fontSize: "18px", whiteSpace: "nowrap" }} align="center">
+                    <TableCell key={key} sx={headerCellStyle} align="center">
                         {
                             unsortableHeaders.includes(key as ExternalHeaders) ?
                                 header
                                 :
-                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrderType.Nothing ? undefined : sortOrder} onClick={() => handleSort(key as SortField)}>
+                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrderType.Non ? undefined : sortOrder} onClick={() => handleSort(key as SortField)}>
                                     {header}
                                 </TableSortLabel>
                         }
@@ -99,7 +103,7 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
                 {getHeader()}
                 {getBody()}
             </Table>
-            <TablePagination sx={{ marginTop: "5%", display: "inline-flex" }} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
+            <TablePagination sx={tablePaginationStyle} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
                 rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage: number) => setPage(newPage)} onRowsPerPageChange={handleChangeRowsPerPage} />
         </>
 
@@ -108,7 +112,7 @@ const ItemsTable = ({ items, setItems, headers, search, handleEditItem }: ItemsT
             items.length > 0 ?
                 getTable()
                 :
-                <Box sx={{ mt: "10%", textAlign: "center" }}>
+                <Box sx={noItemsBoxStyle}>
                     <h1>NO ITEMS</h1>
                 </Box>
         }
